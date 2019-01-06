@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "queue_header.h"
 
+#define QUE_INCLUDE
 struct binary_tree{
 	int data;
 	struct binary_tree *left, *right;
@@ -20,6 +22,10 @@ enum {
 	INSERT=1,
 	DISPLAY,
 	DISPLAY_PREORDER_NONREC,
+	DISPLAY_INORDER_NONREC,
+	DISPLAY_POSTORDER_NONREC,
+	DISPLAY_LEVEL_ORDER,
+	SIZE_OF_BINARY_TREE,
 };
 
 /**************************Function Prototype**********************/
@@ -31,6 +37,8 @@ void push (struct Stack *, struct binary_tree *);
 void traverse_preorder(struct binary_tree *);
 struct binary_tree *pop (struct Stack *);
 int isStackEmpty(struct Stack *);
+void levelOrderTraversal(struct binary_tree *);
+int sizeOfBinaryTreeRec(struct binary_tree *);
 
 
 /**************************Main Function**************************/
@@ -43,6 +51,8 @@ int main()
 		printf("\nPress 1 for insert an element\n");
 		printf("Press 2 for display binary tree\n");
 		printf("Press 3 for display binary tree in non recursive way\n");
+		printf("Press 6 for display level order in binary tree \n");
+		printf("Press 7 size of binary tree \n");
 
 		scanf("%d", &choice);
 		switch(choice){
@@ -62,6 +72,20 @@ int main()
 		case DISPLAY_PREORDER_NONREC:
 			traverse_preorder(start);
 		break;
+		case DISPLAY_LEVEL_ORDER:
+			levelOrderTraversal(start);
+		break;
+		case SIZE_OF_BINARY_TREE:
+		{
+			int size = 0;
+			size = sizeOfBinaryTreeRec(start);
+			if (size < 0){
+				printf("Binary tree is empty\n");
+				break;
+			}
+			printf("Size of the binary %d\n", size);
+		}
+		break;	
 		default:
 			printf("Enter a valid option\n");
 		}
@@ -122,9 +146,11 @@ void display_binary(struct binary_tree *start)
 {
 	if (start == NULL)
 		return;
+//	printf("%d ", start->data);	//for preOredr traversal
 	display_binary(start->left);
-	printf("%d ", start->data);
+	printf("%d ", start->data);	//for inOrder Traversal
 	display_binary(start->right);
+//	printf("%d ", start->data);	//for postOrder Traversal
 }
 
 /********************************Pre-Order***************************************/
@@ -237,3 +263,57 @@ int isStackEmpty(struct Stack *stack)
 {
 	return stack->count;
 }
+
+/*************************************Level Order Traversal***************************/
+void levelOrderTraversal(struct binary_tree *root)
+{
+	struct binary_tree *temp;
+	struct Queue *queue = createQueue(sizeof(struct binary_tree));
+	if (NULL == root){
+		printf("Please check the data %s\n", __func__);
+	}
+	enQueue(queue, root);	
+	while (queue->queueSize){
+		temp = (struct binary_tree *)deQueue(queue);
+		printf("%d ", temp->data);
+		if (temp->left)
+			enQueue(queue, temp->left);
+		if (temp->right)
+			enQueue(queue, temp->right);
+	}
+	free(queue);
+	queue = NULL;
+}
+/********************************Size of Binary Tree*******************************/
+int sizeOfBinaryTreeRec(struct binary_tree *root)
+{
+	if (root == NULL)
+		return 0;
+	return (1 + sizeOfBinaryTreeRec(root->left) + sizeOfBinaryTreeRec(root->right));
+
+}
+/*
+int sizeOfBinaryTreeRec(struct binary_tree *root)
+{
+	struct Queue *queue = NULL;
+	struct binary_tree *temp = NULL;
+	int size = 0;
+	if (root == NULL){
+		printf("Please check the data\n");
+		return -1;
+	}
+	queue = createQueue(sizeof(struct binary_tree));
+	enQueue(queue, root);
+	while (isQueueEmpty(queue)){
+		temp = (struct binary_tree *)deQueue(queue);
+		size++;
+		if (temp->left)
+			enQueue(queue, temp->left);
+		if (temp->right)
+			enQueue(queue, temp->right);
+
+	}
+	free (queue);
+	queue = NULL;
+	return size;
+}*/
