@@ -4,7 +4,7 @@
 
 
 /* This function create queue main node
- * size is data size that you want to store
+ * size is trgument is size of data hat you want to store
  */
 struct Queue *createQueue(int size)
 {

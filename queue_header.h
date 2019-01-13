@@ -12,9 +12,10 @@ struct Queue {
 	struct queueList *start;
 };
 
-struct Queue *createQueue();
+struct Queue *createQueue(int size);
 void my_memcpy(void *, const void *, int);
 void enQueue(struct Queue *, const void *);
 void *deQueue(struct Queue *);
+int isQueueEmpty(struct Queue *);
 #endif
 
