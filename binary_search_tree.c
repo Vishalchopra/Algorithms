@@ -19,6 +19,7 @@ enum {
 	SIZE_OF_BINARY_TREE,
 	DELETE_FULL_BINARY_TREE,
 	HEIGHT_BINARY_TREE,
+	DELETE_NODE_BINARY_TREE,
 };
 
 /**************************Function Prototype**********************/
@@ -31,6 +32,8 @@ void levelOrderTraversal(struct binary_tree *);
 int sizeOfBinaryTreeRec(struct binary_tree *);
 void deleteBinaryTree(struct binary_tree *);
 int heightBinaryTree(struct binary_tree *);
+struct binary_tree *deleteNodeBinaryTree(struct binary_tree *, int data);
+struct binary_tree *minNodeValue(struct binary_tree *);
 
 
 /**************************Main Function**************************/
@@ -48,6 +51,7 @@ int main()
 		printf("Press 7 size of binary tree \n");
 		printf("Press 8 delete Full binary tree \n");
 		printf("Press 9 print height of binary tree \n");
+		printf("Press 10 to delete a Node from  binary tree \n");
 
 		scanf("%d", &choice);
 		switch(choice){
@@ -104,6 +108,20 @@ int main()
 			}
 			deleteBinaryTree(start);
 			start = NULL;
+		break;
+		
+		case DELETE_NODE_BINARY_TREE:
+		{
+			int key;
+			if (NULL == start){
+				printf("Nothing to delete\n");
+				break;
+			}
+			printf("Please Enter node you want to delete\n");
+			scanf("%d", &key);
+			start = deleteNodeBinaryTree(start, key);
+			
+		}
 		break;
 		case HEIGHT_BINARY_TREE:
 		{
@@ -186,7 +204,7 @@ void display_binary(struct binary_tree *start)
 /********************************Pre-Order***************************************/
 void traverse_preorder(struct binary_tree *root)
 {
-	struct Stack *stack = create_stack(struct binary_tree);
+	struct Stack *stack = create_stack(sizeof(*root));
 
 	while (1){
 		while (root != NULL){
@@ -359,6 +377,50 @@ void deleteBinaryTree(struct binary_tree *root)
 	free (queue);
 	queue = NULL;
 	
+}
+
+struct binary_tree *deleteNodeBinaryTree(struct binary_tree *root, int data)
+{
+	if (NULL == root){
+		printf("Node is not in Binary Tree\n");
+		return NULL;
+	
+	}
+	char key, rootData;
+	key = (char) data;
+	rootData = (char)root->data;
+	if (key < rootData)
+		root->left = deleteNodeBinaryTree(root->left, key);
+	else if (key > rootData)
+		root->right = deleteNodeBinaryTree(root->right, key);
+	else {
+		struct binary_tree *temp;
+		if (NULL == root->left){
+			temp = root->right;
+			free(root);
+			root = NULL;
+			return temp;
+		}
+		if (NULL == root->right){
+			temp = root->left;
+			free(root);
+			root = NULL;
+			return temp;
+		}
+		temp = minNodeValue(root);
+		root->data = temp->left->data;
+		free(temp->left);
+		temp->left = NULL;
+	}
+	return root;
+}
+
+struct binary_tree *minNodeValue(struct binary_tree * root)
+{
+	while (NULL == root->left->left)
+		root = root->left;
+
+	return root;
 }
 
 /************************Height of Binary Tree*************************/
